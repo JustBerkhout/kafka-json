@@ -1,0 +1,31 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/just/movie-schema.json",
+    "title": "Movie",
+    "description": "A movie that I have watched",
+    "type": "object",
+    "properties": {
+      "movie-id": {
+        "description": "The unique identifier for a movie",
+        "type": "integer"
+      },
+      "title": {
+        "type": "string",
+        "description": "The movie's title."
+      },
+      "year": {
+        "type": "integer",
+        "description": "The movie's year."
+      },
+  "tags": {
+      "description": "Tags for the movie",
+      "type":"array",
+      "items": {
+          "type":     "string"
+      },
+      "minItems": 1,
+      "uniqueItems":true
+      }
+    },
+    "required": ["movie-id", "title"]
+  }
