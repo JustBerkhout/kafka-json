@@ -148,8 +148,8 @@ services:
       - pgdata:/var/lib/postgresql/data 
  
  
-  volumes:
-    pgdata:
+volumes:
+  pgdata:
 
 networks:
   openmetadata-docker_app_net:
