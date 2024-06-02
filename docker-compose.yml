@@ -129,6 +129,28 @@ services:
       - |
         confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.6.5
         /etc/confluent/docker/run
+
+  pg-demo-db:
+    image: postgres
+    hostname: pg-demo-db
+    container_name: pg-demo-db    
+    restart: always
+    ports:
+      - "5433:5433"    
+    networks:
+      - openmetadata-docker_app_net
+    environment:
+      POSTGRES_USER: gressie
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: demo
+      PGPORT: 5433
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+ 
+ 
+  volumes:
+    pgdata:
+
 networks:
   openmetadata-docker_app_net:
     external: true
