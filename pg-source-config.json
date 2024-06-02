@@ -1,0 +1,14 @@
+{
+    "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+    "connection.url": "jdbc:postgresql://pg-demo-db:5433/demo?sslmode=disable",
+    "connection.user": "gressie",
+    "connection.password": "example",
+    "table.whitelist": "instrument_readings",
+    "mode": "incrementing",
+    "incrementing.column.name":"id",
+    "poll.interval.ms": "2000",
+    "value.converter": "io.confluent.connect.json.JsonSchemaConverter",
+    "value.converter.schema.registry.url": "http://schema-registry:8081",    
+    "topic.prefix": "pg_source_",
+    "tasks.max": "1"
+}

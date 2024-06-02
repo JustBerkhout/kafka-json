@@ -69,7 +69,7 @@ $ kafka-console-consumer --bootstrap-server gkm:9092 --topic movie --from-beginn
 
 ## Connect datagen
 
-Must use `JsonSchemaConverter`
+Relies on `JsonSchemaConverter`
 Appears already installed on `confluentinc/cp-kafka-connect:7.6.1`
 
 ```
@@ -103,6 +103,8 @@ kafka-json-schema-console-consumer --bootstrap-server gkm:9092 --topic pageviews
 
 ## postgres source
 
+### datagen script
+
 source `psql` env variables.
 ```
 . pg.env
@@ -112,4 +114,19 @@ run script
 
 ```
 ./pg-insert-script.sh
+```
+
+### source connector
+
+Relies on `JsonSchemaConverter`
+Appears already installed on `confluentinc/cp-kafka-connect:7.6.1`
+
+```
+ curl -i -X PUT http://gkm:8083/connectors/pg-instrument-reading-source/config \
+     -H "Content-Type: application/json" \
+     -d '@pg-source-config.json' | jq
+```
+
+```
+kafka-console-consumer --bootstrap-server gkm:9092 --topic pageviews | jq
 ```
