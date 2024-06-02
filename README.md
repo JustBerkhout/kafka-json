@@ -66,3 +66,36 @@ $ kafka-console-consumer --bootstrap-server gkm:9092 --topic movie --from-beginn
 ```
 
 
+
+## Connect datagen
+
+Must use `JsonSchemaConverter`
+Appears already installed on `confluentinc/cp-kafka-connect:7.6.1`
+
+```
+ curl -i -X PUT http://gkm:8083/connectors/datagen_local_01/config \
+     -H "Content-Type: application/json" \
+     -d '{
+            "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
+            "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+            "value.converter": "io.confluent.connect.json.JsonSchemaConverter",
+            "value.converter.schema.registry.url": "http://schema-registry:8081",          
+            "kafka.topic": "pageviews",
+            "quickstart": "pageviews",
+            "max.interval": 1000,
+            "iterations": 10000000,
+            "tasks.max": "1"
+        }' | jq
+```
+
+NOTE the `value-converter` runs in the connect task runtime, and appears to only have access to the 
+docker hostnames (i.e. must be `http://schema-registry:8081"`)
+
+
+```
+kafka-console-consumer --bootstrap-server gkm:9092 --topic pageviews | jq
+```
+
+```
+kafka-json-schema-console-consumer --bootstrap-server gkm:9092 --topic pageviews --property schema.registry.url=http://gkm:8081 | jq
+```

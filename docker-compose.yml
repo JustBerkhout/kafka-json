@@ -77,6 +77,58 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka1:29092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081      
 
+  connect1:
+    image: confluentinc/cp-kafka-connect:7.6.1
+    hostname: connect1
+    container_name: connect1
+    restart: always    
+    depends_on:
+      - schema-registry
+    ports:
+      - 8083:8083        
+    networks:
+      - openmetadata-docker_app_net
+    environment:
+      CUB_CLASSPATH: '/usr/share/java/confluent-security/connect/*:/usr/share/java/kafka/*:/usr/share/java/cp-base-new/*'
+
+      CONNECT_BOOTSTRAP_SERVERS: kafka1:29092
+      CONNECT_LISTENERS: http://0.0.0.0:8083
+      CONNECT_GROUP_ID: "connect-cluster"
+      CONNECT_PRODUCER_CLIENT_ID: "connect1-worker-producer"
+      CONNECT_PRODUCER_ENABLE_IDEMPOTENCE: 'true'
+
+      CONNECT_CONFIG_STORAGE_TOPIC: connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: connect-statuses
+
+      CONNECT_REPLICATION_FACTOR: 1
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.storage.StringConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect1
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      CONNECT_LOG4J_LOGGERS: org.reflections=ERROR
+      # CLASSPATH: "/usr/share/java/monitoring-interceptors/*"
+
+      # Allow overriding configs on the connector level
+      CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: 'All'
+      
+      # Reduce Connect memory utilization
+      KAFKA_JVM_PERFORMANCE_OPTS: -server -XX:+UseG1GC -XX:GCTimeRatio=1
+                  -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20
+                  -XX:MaxGCPauseMillis=10000 -XX:InitiatingHeapOccupancyPercent=35 -XX:+ExplicitGCInvokesConcurrent
+                  -XX:MaxInlineLevel=15 -Djava.awt.headless=true
+    command:
+      - bash
+      - -c
+      - |
+        confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.6.5
+        /etc/confluent/docker/run
 networks:
   openmetadata-docker_app_net:
     external: true
