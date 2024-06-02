@@ -99,3 +99,17 @@ kafka-console-consumer --bootstrap-server gkm:9092 --topic pageviews | jq
 ```
 kafka-json-schema-console-consumer --bootstrap-server gkm:9092 --topic pageviews --property schema.registry.url=http://gkm:8081 | jq
 ```
+
+
+## postgres source
+
+source `psql` env variables.
+```
+. pg.env
+```
+
+run script
+
+```
+./pg-insert-script.sh
+```
