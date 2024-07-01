@@ -1,0 +1,66 @@
+********SETUP*************
+Show the cluster setup
+use show-docker-cluster-minimal
+
+just zookeeper, 1 kafka-node one schemaregistry node
+
+schema registry is under the Confluent Community license. 
+https://www.confluent.io/confluent-community-license-faq/
+
+
+Show some emptiness in broker, show some emptiness in SR
+
+********INTRODUCE MOVIES*************
+Show schema
+Show list
+
+threaten to register schema using SR REST (but don't do it)
+https://docs.confluent.io/platform/current/schema-registry/develop/api.html
+
+
+
+****** PRODUCE A MOVIE ********
+shuf -n 1 movies.file
+
+kafka-json-schema-console-producer --bootstrap-server gkm:9092 --topic movie \
+--property value.schema.file=movie-schema.json \
+--property schema.registry.url=http://gkm:8081
+
+
+***** CONSUME THE MOVIE ******
+kafka-json-schema-console-consumer --bootstrap-server gkm:9092 --topic movie \
+--property schema.registry.url=http://gkm:8081 \
+--from-beginning | jq
+
+**** PRODUCE THE LOT ******
+kafka-json-schema-console-producer --bootstrap-server gkm:9092 --topic movie \
+--property value.schema.file=movie-schema.json \
+--property schema.registry.url=http://gkm:8081 < movies.file
+
+
+
+*********** BREAK IT **************
+
+*****ONE: READ IT WITH SCHEMA UNAWARE CONSUMER *****************
+kafka-console-consumer --bootstrap-server gkm:9092 --topic movie \
+--from-beginning --max-messages 2| jq
+
+
+*****TWO: PRODUCE NON COMPLIANT DATA with SCHEMA AWARE Producer *******
+grep 2001 movies.file
+
+
+
+
+
+*****THREE: PRODUCE COMPLIANT DATA with SCHEMA UNAWARE Producer *******
+shuf -n 1 movies.file
+kafka-console-producer --bootstrap-server gkm:9092 --topic movie 
+
+DEMONSTRATE THAT THE CLI-CONSUMERS ACTUALLY FAIL, BUT CAN BE MADE RESILIENT USING --skip-on....
+
+*****FOUR: PRODUCE NON-COMPLIANT DATA with SCHEMA UNAWARE Producer *******
+Snakes on PLanes, 2006, Horror, Action
+kafka-console-producer --bootstrap-server gkm:9092 --topic movie 
+
+DEMONSTRATE THAT THE CLI-CONSUMERS ACTUALLY FAIL, BUT CAN BE MADE RESILIENT USING --skip-on....
